@@ -3,6 +3,7 @@ import pathlib
 import cv2
 import re
 import pytesseract
+import easyocr
 from pytesseract import Output
 from difflib import SequenceMatcher
 import statistics
@@ -78,6 +79,13 @@ def test_recognition(rec_type, val_type, dataset_name, show_img=False):
                 dict_for_avg_of_aug_dataset[img_name_wo_aug].append(result)
             else:
                 dict_for_avg_of_aug_dataset[img_name_wo_aug] = [result]
+        elif rec_type == "easy_ocr":
+            reader = easyocr.Reader(["en", "ru"])
+            result_easy = reader.readtext(img, detail=0, paragraph=True)
+
+            result = ""
+            for i in result_easy:
+                result += i
 
         result = "".join(result.splitlines())
 
@@ -140,7 +148,8 @@ def test_recognition(rec_type, val_type, dataset_name, show_img=False):
 
     with open(
         str(
-            rel_path("results_trained_" + val_type + "_" + rec_type + "_" + dataset_name + ".txt"
+            rel_path(
+                "results_" + val_type + "_" + rec_type + "_" + dataset_name + ".txt"
             )
         ),
         "w",
@@ -150,10 +159,10 @@ def test_recognition(rec_type, val_type, dataset_name, show_img=False):
 
 
 def main():
-    test_recognition("boxes_recognition", "binary_correct", "dataset", show_img=False)
-    test_recognition("boxes_recognition", "similarity", "dataset", show_img=False)
-    test_recognition("boxes_recognition", "binary_correct", "dataset2", show_img=False)
-    test_recognition("boxes_recognition", "similarity", "dataset2", show_img=False)
+    test_recognition("easy_ocr", "binary_correct", "dataset", show_img=False)
+    test_recognition("easy_ocr", "similarity", "dataset", show_img=False)
+    test_recognition("easy_ocr", "binary_correct", "dataset2", show_img=False)
+    test_recognition("easy_ocr", "similarity", "dataset2", show_img=False)
 
 
 if __name__ == "__main__":
